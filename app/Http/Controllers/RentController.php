@@ -21,14 +21,14 @@ class RentController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api');
+        // $this->middleware('auth:api');
     }
 
     public function rent(Request $request){
         $rentRequest = RentRequest::where('user_id',auth()->user()->id)->where('book_id',$request->book_id)->first();
         if($rentRequest){
             if(!$rentRequest->returned)
-            return response(['message'=>'already rented']);
+            return response()->json(['message'=>'already rented']);
         }
         else{
             $rentRequest = new RentRequest();
@@ -57,7 +57,7 @@ class RentController extends Controller
     public function removeRequest(Request $request){
         $rentRequest = RentRequest::find($request->request_id);
         $rentRequest->delete();
-        return response(['message'=>'request removed succesffuly']);
+        return response()->json(['message'=>'request removed succesffuly']);
     }
     public function returnBook(Request $request){
         $rentRequest = RentRequest::where('user_id',auth()->user()->id)->where('book_id',$request->book_id)->first();

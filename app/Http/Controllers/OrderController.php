@@ -10,6 +10,10 @@ use App\Models\Category;
 use App\Models\Order;
 
 
+// caching using redis
+use Illuminate\Support\Facades\Redis;
+
+
 
 class OrderController extends Controller
 {
@@ -18,9 +22,11 @@ class OrderController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    
+     public function __construct()
     {
-        $this->middleware('auth:api');
+        // $this->middleware('auth:api');
+        
     }
 
     public function buy(Request $request){
@@ -30,7 +36,7 @@ class OrderController extends Controller
         $order->quantity = $request->quantity;
         $book = Book::findorfail($request->book_id);
         if($request->quantity > $book->quantity){
-            return reponse(["message:","Transaction failed"],400);
+            return response()->json(["message:","Transaction failed"],400);
         }
         $order->amount = $book->price*$request->quantity;
         $order->save();
@@ -41,6 +47,10 @@ class OrderController extends Controller
 
     public function getbook(){
         $user = auth()->user();
+
+        // caching books
+        
+        
         $orders = Order::where('user_id', $user->id)->get();
         $bookIds = $orders->pluck('book_id');
         $books = Book::whereIn('id', $bookIds)->get();
@@ -65,8 +75,14 @@ class OrderController extends Controller
         return response()->json($orders);
     }
     public function getbooks(){
-        $books = Book::all();
-        return response()->json($books);
+        $cacheKey = 'books';
+        
+        
+            $books = Book::all();
+            Redis::set($cacheKey, $books);
+        
+       
+        return response()->json($books,200);
     }
     //
 }

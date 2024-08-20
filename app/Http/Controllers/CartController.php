@@ -23,11 +23,11 @@ class CartController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api');
+        // $this->middleware('auth:api');
     }
     public function getRentedBooks(){
         $user = auth()->user();
-        $books = RentRequest::where('user_id',$user_id)->where('status_id');
+        $books = RentRequest::where('user_id',$user->id)->where('status_id');
         
     }
     public function updateCart(Request $request){
@@ -35,6 +35,7 @@ class CartController extends Controller
         $cart = Cart::where('user_id',$user->id)->first();
         $cartItem = CartItem::where('book_id',$request->book_id)->where('cart_id',$cart->id)->first();
         $book = Book::find($request->book_id);
+        
         if($request->quantity>$book->quantity){
             $cartItem->quantity=$book->quantity;
         }
@@ -77,7 +78,7 @@ class CartController extends Controller
         
         $cartItem = CartItem::where('cart_id',$cart->id)->where('book_id',$request->book_id)->first();
         if(!$cartItem){
-            return response(['message'=>'product not found'],404);
+            return response()->josn(['message'=>'product not found'],404);
         }
         
         $cartItem->delete();
@@ -88,11 +89,11 @@ class CartController extends Controller
         $user = auth()->user();
         $cart = Cart::where('user_id',$user->id)->first();
         if(!$cart){
-            return response(['message'=>'no item found'],404);
+            return response()->json(['message'=>'no item found'],404);
         }
         $cartItems = CartItem::where('cart_id',$cart->id)->get();
         if(!$cartItems){
-            return response(['message  '=>'no item found'],404);
+            return response()->json(['message  '=>'no item found'],404);
         }
         return response()->json($cartItems);
     }
@@ -108,7 +109,7 @@ class CartController extends Controller
         $order->quantity = $item->quantity;
         $book = Book::findorfail($item->book_id);
         if($item->quantity > $book->quantity){
-            return reponse(["message:","Transaction failed"],400);
+            return response()->json(["message:","Transaction failed"],400);
         }
         $order->amount = $book->price*$item->quantity;
         $order->save();
@@ -116,7 +117,7 @@ class CartController extends Controller
         $book->save();
         $item->delete();
         }
-        return response(["message"=>"cart checkeout succesfull"]);
+        return response()->json(["message"=>"cart checkeout succesfull"]);
     }
 
     

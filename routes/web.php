@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\OrderController;
 
 /** @var \Laravel\Lumen\Routing\Router $router */
 
@@ -19,18 +20,18 @@ $router->get('/', function () use ($router) {
 
 
 // admin funcs
-$router->group(['prefix'=>'api/admin'],function($router){
+$router->group(['prefix'=>'api/admin','middleware'=>'auth:admin'],function($router){
     // category related routes
     $router->post('/addcategory','AdminController@addCategory');
-    $router->post('/modifycategory','AdminController@modifyCategory');
-    $router->post('/deletecategory','AdminController@deleteCategory');
+    $router->post('/modifycategory',['middleware'=>['cache:books,del'],'uses'=>'AdminController@modifyCategory']);
+    $router->post('/deletecategory',['middleware'=>['cache:books,del'],'uses'=>'AdminController@deleteCategory']);
     $router->get('/getcategories','AdminController@categories');
 
     // book related routes
-    $router->post('/addbook','AdminController@addBook');
-    $router->post('/modifybook','AdminController@modifyBook');
-    $router->post('/deletebook','AdminController@deleteBook');
-    $router->get('/getbooks','AdminController@books');
+    $router->post('/addbook',['middleware'=>['cache:books,del'],'uses'=>'AdminController@addBook']);
+    $router->post('/modifybook',['middleware'=>['cache:books,del'],'uses'=>'AdminController@modifyBook']);
+    $router->post('/deletebook',['middleware'=>['cache:books,del'],'uses'=>'AdminController@deleteBook']);
+    $router->get('/getbooks',['middleware'=>['cache:books'],'uses'=>'AdminController@books']);
     $router->post('/getcategorisedbooks','AdminController@getbook');
 
     // request related routes
@@ -45,10 +46,11 @@ $router->group(['prefix'=>'api/admin'],function($router){
     // order related routes
     $router->get('/getorders','AdminController@getOrders');
 
+
 });
 
-// user funcs
-$router->group(['prefix'=>'api/user'],function($router){
+// user func
+$router->group(['prefix'=>'api/user','middleware'=>['auth:api']],function($router){
 
     // cart related routes
     $router->post('/add','CartController@addItem');
@@ -65,13 +67,13 @@ $router->group(['prefix'=>'api/user'],function($router){
 
     // books related requests
     $router->get('/getcategories','RentController@getCategories');
-    $router->post('/buy','OrderController@buy');
+    $router->post('/buy',['middleware'=>['cache:books,del'],'uses'=>'OrderController@buy']);
     $router->get('/ownedbooks','OrderController@getbook');
-    $router->get('/getbooks','OrderController@getbooks');
+    $router->get('/getbooks',['middleware'=>['cache:books'],'uses' => 'OrderController@getbooks']);
     $router->get('/getorders','OrderController@getOrders');
-    
+
 });
-    
+
 
 // user login
 $router->group(['prefix'=>'api/user'],function($router){
@@ -80,7 +82,7 @@ $router->group(['prefix'=>'api/user'],function($router){
     $router->post('/register','UserAuthController@register');
     $router->post('/updateprofile','UserAuthController@update');
     $router->post('/profile','UserAuthController@profile');
-    
+
 });
 
 

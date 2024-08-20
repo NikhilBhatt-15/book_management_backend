@@ -22,13 +22,14 @@ class UserAuthController extends Controller
         $user->save();
         return response()->json($user);
     }
-    
+
     public function profile(){
         return auth()->user();
     }
     // login generate jwt token after validating details
     public function login(Request $request)
     {
+
 
         $this->validate($request, [
             'email' => 'required|string',
@@ -40,7 +41,7 @@ class UserAuthController extends Controller
         if (! $token = auth()->guard('api')->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
-        
+
         return $this->respondWithToken($token);
     }
 
