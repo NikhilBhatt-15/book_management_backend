@@ -16,7 +16,7 @@ class CacheMiddleware
      */
     const BASE = "lumen_database_";
     public function handle($request, Closure $next ,$key,$action=null)
-    {   
+    {
         // dd($action);
         if($action){
             Redis::del($key);
@@ -25,7 +25,7 @@ class CacheMiddleware
             $items = Redis::get($key);
             return response()->json(json_decode($items));
         }
-        
-            return $next($request);
+
+             $next($request);
     }
 }

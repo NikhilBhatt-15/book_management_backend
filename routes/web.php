@@ -31,7 +31,7 @@ $router->group(['prefix'=>'api/admin','middleware'=>'auth:admin'],function($rout
     $router->post('/addbook',['middleware'=>['cache:books,del'],'uses'=>'AdminController@addBook']);
     $router->post('/modifybook',['middleware'=>['cache:books,del'],'uses'=>'AdminController@modifyBook']);
     $router->post('/deletebook',['middleware'=>['cache:books,del'],'uses'=>'AdminController@deleteBook']);
-    $router->get('/getbooks',['middleware'=>['cache:books'],'uses'=>'AdminController@books']);
+    $router->get('/getbooks',['middleware'=>['cache:books',null],'uses'=>'AdminController@books']);
     $router->post('/getcategorisedbooks','AdminController@getbook');
 
     // request related routes
