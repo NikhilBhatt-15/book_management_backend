@@ -26,6 +26,6 @@ class CacheMiddleware
             return response()->json(json_decode($items));
         }
 
-             $next($request);
+             return $next($request);
     }
 }
